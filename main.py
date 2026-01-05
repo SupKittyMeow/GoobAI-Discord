@@ -34,6 +34,8 @@ async def on_ready():
 @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @discord.app_commands.allowed_installs(guilds=True, users=True)
 async def on_message(interaction: discord.Interaction, question: str):
+    await interaction.response.defer()
+
     completion = client.chat.completions.create(
         model='moonshotai/kimi-k2-instruct-0905',
         messages=[
@@ -57,6 +59,6 @@ async def on_message(interaction: discord.Interaction, question: str):
         stop=None
     )
 
-    await interaction.response.send_message(f'{interaction.user.display_name}: {question}\nGoofy Goober: {completion.choices[0].message.content}')
+    await interaction.followup.send(f'{interaction.user.display_name}: {question}\nGoofy Goober: {completion.choices[0].message.content}')
 
 bot.run(str(os.environ['DISCORD_BOT_TOKEN']))
