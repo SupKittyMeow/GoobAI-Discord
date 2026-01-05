@@ -14,11 +14,11 @@ bot = commands.Bot(command_prefix='/', intents=intents)
 
 # Groq AI stuff
 client = AsyncGroq(api_key=os.environ['GROQ_API_KEY'])
-system_prompt_url = 'https://raw.githubusercontent.com/GoobApp/goobAI-system-prompt/refs/heads/main/prompt.txt'
+system_prompt_url = 'https://ai.goobapp.org/prompt.txt'
 system_prompt = ''
 
 try:
-    response = requests.get(system_prompt_url)
+    response = requests.get(system_prompt_url) # TODO: check for new system prompt every bot message, so also cache and not return full thing if already most recent
     if response.status_code == 200:
         system_prompt = response.text
     else:
@@ -64,3 +64,4 @@ async def on_message(interaction: discord.Interaction, question: str):
 
 
 bot.run(str(os.environ['DISCORD_BOT_TOKEN']))
+
