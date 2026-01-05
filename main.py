@@ -42,11 +42,7 @@ async def on_message(interaction: discord.Interaction, question: str):
         messages=[
         {
             'role': 'system',
-            'content': system_prompt
-        },
-        {
-            'role': 'system',
-            'content': f'The user who messaged you is: {interaction.user.display_name}'
+            'content': f'{system_prompt}\n\nThe user who messaged you is: {interaction.user.display_name}'
         },
         {
             'role': 'user',
@@ -64,4 +60,5 @@ async def on_message(interaction: discord.Interaction, question: str):
 
 
 bot.run(str(os.environ['DISCORD_BOT_TOKEN']))
+
 
