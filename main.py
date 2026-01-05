@@ -1,0 +1,62 @@
+from groq import Groq
+import discord
+from discord.ext import commands
+import dotenv
+import os
+
+dotenv.load_dotenv()
+
+# Discord stuff
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix='/', intents=intents)
+
+# Groq AI stuff
+client = Groq(api_key=os.environ['GROQ_API_KEY'])
+system_prompt_path = './system_prompt.txt'
+system_prompt = ''
+try:
+    with open(system_prompt_path, 'r', encoding='utf-8') as f:
+        system_prompt = f.read()
+
+except FileNotFoundError:
+    print(f'Error: The file "{system_prompt_path}"" was not found.')
+except Exception as e:
+    print(f'An error occurred: {e}')
+
+
+@bot.event
+async def on_ready():
+    await bot.tree.sync()
+    print(f'Bot is logged in and ready!')
+
+@bot.tree.command(name='ask', description='Ask Goofy Goober a question')
+@discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@discord.app_commands.allowed_installs(guilds=True, users=True)
+async def on_message(interaction: discord.Interaction, question: str):
+    completion = client.chat.completions.create(
+        model='moonshotai/kimi-k2-instruct-0905',
+        messages=[
+        {
+            'role': 'system',
+            'content': system_prompt
+        },
+        {
+            'role': 'system',
+            'content': f'The user who messaged you is: {interaction.user.display_name}'
+        },
+        {
+            'role': 'user',
+            'content': question
+        },
+        ],
+        temperature=0.6,
+        max_completion_tokens=4096,
+        top_p=1,
+        stream=False,
+        stop=None
+    )
+
+    await interaction.response.send_message(f'{interaction.user.display_name}: {question}\nGoofy Goober: {completion.choices[0].message.content}')
+
+bot.run(str(os.environ['DISCORD_BOT_TOKEN']))
