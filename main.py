@@ -42,12 +42,11 @@ async def on_message(interaction: discord.Interaction, question: str):
         messages=[
         {
             'role': 'system',
-            'content': system_prompt,
+            'content': f'{system_prompt}\n\nThe user who messaged you is: {interaction.user.display_name}'
         },
         {
             'role': 'user',
-            'name': interaction.user.display_name,
-            'content': question,
+            'content': question
         },
         ],
         temperature=0.6,
